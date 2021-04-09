@@ -55,3 +55,23 @@ Feel free to make any changes to the `nextDay` method and add any new code as lo
 still works correctly. However, do not alter the `Item` class or `items` property as those belong to the goblin in the corner who will insta-rage you as he doesn't believe in shared code ownership (you can make the `nextDay` method and `items` property static if you like, we'll cover for you).
 
 Just for clarification, an item can never have its Quality increase above 50, however "Sulfuras" is a legendary item and as such its Quality is 80 and it never alters.
+
+## Implementation
+
+The first thing I thought when looking at the task was, what happens when the list of Items grows to 1000+
+with at least 25% of them having custom rules.
+
+1. The code would become unmanageable
+2. This would be expensive for the business to get a developer to add a new item each time and update code
+
+So my solution was to redo the architectural design so that the rules would come from a database, with a One to Many
+relationship between and Item and Rules table.
+
+Each item can have multiple rules as demonstrated in MockItemFactory.php
+
+Follow up work to this would be to create an Admin section to the website that would make it possible for a product 
+manager to add items and rules to the system with-out requiring a developer, it could also be possible to create
+functionality that would allow the admin user to run a simulation so that the rules they entered are run and output is 
+generated showing them how the sellIn value and Quality would change over a specified period of time, say 30 days
+this would allow the admin to review that their configuration is going to work as expected, possibly saving the need for
+a dev to write functional tests and also passes the responsibility back to the product owner.

@@ -2,15 +2,30 @@
 
 namespace App;
 
+use App\Helpers\RuleRunner;
+use App\Data\Entities\ItemEntity;
+
 class GildedRose
 {
-    private $items;
+    /**
+     * @var ItemEntity[]
+     */
+    private array $items;
 
+    /**
+     * GildedRose constructor.
+     *
+     * @param ItemEntity[] $items
+     */
     public function __construct(array $items)
     {
         $this->items = $items;
     }
 
+    /**
+     * @param int|null $which
+     * @return ItemEntity|ItemEntity[]
+     */
     public function getItem($which = null)
     {
         return ($which === null
@@ -19,52 +34,18 @@ class GildedRose
         );
     }
 
+    /**
+     * @return void
+     *
+     * note: there seems to be a bug with Kahlan testing package, it is not possible to use a return
+     * type of :void in the function declaration. Kahlan errors saying
+     *
+     * PHP Fatal error:  A void function must not return a value when no value is being returned.
+     */
     public function nextDay()
     {
         foreach ($this->items as $item) {
-            if ($item->name != 'Aged Brie' and $item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                if ($item->quality > 0) {
-                    if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                        $item->quality = $item->quality - 1;
-                    }
-                }
-            } else {
-                if ($item->quality < 50) {
-                    $item->quality = $item->quality + 1;
-                    if ($item->name == 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->sellIn < 11) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                        if ($item->sellIn < 6) {
-                            if ($item->quality < 50) {
-                                $item->quality = $item->quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
-            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                $item->sellIn = $item->sellIn - 1;
-            }
-            if ($item->sellIn < 0) {
-                if ($item->name != 'Aged Brie') {
-                    if ($item->name != 'Backstage passes to a TAFKAL80ETC concert') {
-                        if ($item->quality > 0) {
-                            if ($item->name != 'Sulfuras, Hand of Ragnaros') {
-                                $item->quality = $item->quality - 1;
-                            }
-                        }
-                    } else {
-                        $item->quality = $item->quality - $item->quality;
-                    }
-                } else {
-                    if ($item->quality < 50) {
-                        $item->quality = $item->quality + 1;
-                    }
-                }
-            }
+            (new RuleRunner($item))->runRules();
         }
     }
 }
